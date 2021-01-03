@@ -1,4 +1,7 @@
-import React, { Component } from 'react'
+import React, {
+  useState
+} from 'react'
+
 import Header from "./Header"
 import PostList from "./PostList"
 import Footer from "./Footer"
@@ -31,29 +34,29 @@ const initPost = [
   }
 ]
 
-class App extends Component {
+function App() {
 
-  state = {
-    posts: initPost,
-    theme: 'light',
-    check: false
+  const [ posts, setPosts ] = useState(initPost)
+  const [ theme, setTheme ] = useState('light')
+  const [ check, setCheck ] = useState(false)
+  // state = {
+  //   posts: initPost,
+  //   theme: 'light',
+  //   check: false
+  // }
+
+  const change = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light')
+    setCheck(!check)
   }
 
-  change = () => {
-    this.setState({
-      theme: this.state.theme === 'light' ? 'dark' : 'light',
-      check: !this.state.check
-    })
-  }
-
-  render() {
-    return (
-      <div className={`app ${this.state.theme}`}>
-        <Header check={this.state.check} changeTheme={this.change} />
-        <PostList posts={this.state.posts} />
-        <Footer />
-      </div>
-    )
-  }
+  return (
+    <div className={ `app ${ theme }` }>
+      <Header check={ check } changeTheme={ change }/>
+      <PostList posts={ posts }/>
+      <Footer/>
+    </div>
+  )
 }
+
 export default App
