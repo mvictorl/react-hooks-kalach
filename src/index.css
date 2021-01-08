@@ -211,3 +211,15 @@ code {
 .plus.like:before{
   color: red;
 }
+
+.tabs button {
+  background: #021529;
+  color: #fff;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  cursor: pointer;
+}
+.app.dark .tabs button {
+  background: #282c35;
+}

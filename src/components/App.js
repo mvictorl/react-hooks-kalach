@@ -1,49 +1,32 @@
 import React, {
-  useState
+  useState,
+  useEffect
 } from 'react'
 
 import Header from "./Header"
 import PostList from "./PostList"
 import Footer from "./Footer"
 
-const initPost = [
-  {
-    id: 1,
-    title: "Title",
-    body: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis quaerat autem eos fuga voluptas deserunt laudantium! Similique delectus consequuntur, magni perferendis quam assumenda recusandae, facilis aliquid, eius provident eveniet architecto!"
-  },
-  {
-    id: 2,
-    title: "Title",
-    body: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis quaerat autem eos fuga voluptas deserunt laudantium! Similique delectus consequuntur, magni perferendis quam assumenda recusandae, facilis aliquid, eius provident eveniet architecto!"
-  },
-  {
-    id: 3,
-    title: "Title",
-    body: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis quaerat autem eos fuga voluptas deserunt laudantium! Similique delectus consequuntur, magni perferendis quam assumenda recusandae, facilis aliquid, eius provident eveniet architecto!"
-  },
-  {
-    id: 5,
-    title: "Title",
-    body: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis quaerat autem eos fuga voluptas deserunt laudantium! Similique delectus consequuntur, magni perferendis quam assumenda recusandae, facilis aliquid, eius provident eveniet architecto!"
-  },
-  {
-    id: 6,
-    title: "Title",
-    body: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis quaerat autem eos fuga voluptas deserunt laudantium! Similique delectus consequuntur, magni perferendis quam assumenda recusandae, facilis aliquid, eius provident eveniet architecto!"
-  }
-]
-
 function App() {
 
-  const [ posts, setPosts ] = useState(initPost)
+  const [ posts, setPosts ] = useState([])
   const [ theme, setTheme ] = useState('light')
   const [ check, setCheck ] = useState(false)
-  // state = {
-  //   posts: initPost,
-  //   theme: 'light',
-  //   check: false
-  // }
+
+  const [ typeRequest, setTypeRequest ] = useState('posts')
+
+  useEffect(() => {
+    setTimeout(() => {
+      document.title = `${ typeRequest } Page`
+    }, 500)
+
+    fetch(`https://jsonplaceholder.typicode.com/${ typeRequest }?_start=0&_limit=10`)
+      .then(response => response.json())
+      .then(json => setPosts(json))
+    return () => {
+      document.title = 'Page'
+    }
+  }, [ typeRequest ])
 
   const change = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
@@ -52,8 +35,14 @@ function App() {
 
   return (
     <div className={ `app ${ theme }` }>
-      <Header check={ check } changeTheme={ change }/>
+      <Header
+        changeTypeRequest={ setTypeRequest }
+        check={ check }
+        changeTheme={ change }
+      />
+
       <PostList posts={ posts }/>
+
       <Footer/>
     </div>
   )
