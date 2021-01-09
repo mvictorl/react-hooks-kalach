@@ -155,7 +155,7 @@ ___
 
 ```js
 const memoizedValue = useMemo(() => 
-  computeExpensiveValue(a, b), [a, b]);
+  computeExpensiveValue(a, b), [a, b])
 ```
 
 > Первый параметр — мемоизируемая _callback_-функция.
@@ -191,4 +191,61 @@ const memoizedValue = useMemo(() =>
    ```javascript
    const sum = useMemo(() => testSum(counter), [ counter ])
    ```
+___
 
+##§4 Хук прямого взаимодействия с DOM `useRef`
+
+```js
+const refContainer = useRef(initialValue)
+```
+
+`useRef` возвращает изменяемый ref-объект, свойство `.current` которого инициализируется переданным аргументом `initialValue`. \
+Возвращённый объект будет сохраняться в течение всего времени жизни компонента.
+
+Мутирование свойства `.current` не вызывает повторный рендер. \
+Если необходимо запустить некоторый код, когда React присоединяет или отсоединяет _ref_ к узлу DOM, можно использовать [_callback_-реф](https://ru.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node) вместо этого.
+
+1. Добавляем импорт `useRef` из библиотеки `react`:
+
+   ```javascript
+   import { useRef } from "react"
+   ```
+   
+2. Создаем переменную `myRef` с помощью функции `useRef`, инициализируя её начальным значением `null`:
+
+   ```javascript
+   const myRef = useRef(null)
+   ```
+   
+> В данном случае, при инициализации
+>```javascript
+>myRef == { current: null }
+>```
+
+3. Для демонстрации использования `useRef` добавляем элементы `<input>` с атрибутом `ref` равным `myRef` и `<button>` с обработчиком `onClick` равным пользовательской функции `handlerFocus`:
+
+   ```javascript
+   const handlerFocus = () => {
+      console.log(myRef.current)
+   }
+   ```
+> Теперь _ref_ равен
+>```javascript
+>myRef == { current: input }
+>```
+>а его значение _current_
+>```javascript
+>myRef.current == <input type="text">
+>```
+
+4. Теперь возможны манипуляции с данным DOM-элементом. \
+   Например, передача ему фокуса и/или изменение цвета текста:
+   
+   ```javascript
+   const handlerFocus = () => {
+      myRef.current.focus()
+      myRef.current.style.color = 'red'
+   }
+   ```
+   
+___

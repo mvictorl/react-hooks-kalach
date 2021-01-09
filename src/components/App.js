@@ -1,6 +1,7 @@
 import React, {
   useState,
-  useEffect
+  useEffect,
+  useRef
 } from 'react'
 
 import Header from "./Header"
@@ -8,6 +9,8 @@ import PostList from "./PostList"
 import Footer from "./Footer"
 
 function App() {
+
+  const myRef = useRef(null)
 
   const [ posts, setPosts ] = useState([])
   const [ theme, setTheme ] = useState('light')
@@ -33,8 +36,18 @@ function App() {
     setCheck(!check)
   }
 
+  const handlerFocus = () => {
+    myRef.current.focus()
+    myRef.current.style.color = 'red'
+  }
+
   return (
     <div className={ `app ${ theme }` }>
+      <div className="form">
+        <input ref={ myRef } type="text"/>
+        <button onClick={ handlerFocus }>Focus</button>
+      </div>
+
       <Header
         changeTypeRequest={ setTypeRequest }
         check={ check }
