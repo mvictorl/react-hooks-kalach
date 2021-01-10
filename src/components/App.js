@@ -1,22 +1,24 @@
 import React, {
   useState,
   useEffect,
-  useRef
+  useRef,
+  useContext
 } from 'react'
+
+import ThemeContext from "../context"
 
 import Header from "./Header"
 import PostList from "./PostList"
 import Footer from "./Footer"
 
 function App() {
-
   const myRef = useRef(null)
 
   const [ posts, setPosts ] = useState([])
-  const [ theme, setTheme ] = useState('light')
   const [ check, setCheck ] = useState(false)
-
   const [ typeRequest, setTypeRequest ] = useState('posts')
+
+  const { theme, setTheme } = useContext(ThemeContext)
 
   useEffect(() => {
     setTimeout(() => {
