@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CheckBox from "../common/CheckBox"
 
 const Header = ({ changeTypeRequest, check, changeTheme }) => {
+  useEffect(() => {
+    console.log('Update <Header>')
+  }, [changeTypeRequest])
+
   return (
     <header className="blog-header">
       <div className="layout layout-header">
@@ -10,8 +14,8 @@ const Header = ({ changeTypeRequest, check, changeTheme }) => {
         </div>
 
         <div className="tabs">
-          <button onClick={() => changeTypeRequest('posts')}>Посты</button>
-          <button onClick={() => changeTypeRequest('users')}>Пользователи</button>
+          <button onClick={ () => changeTypeRequest('posts') }>Посты</button>
+          <button onClick={ () => changeTypeRequest('users') }>Пользователи</button>
         </div>
 
         <CheckBox

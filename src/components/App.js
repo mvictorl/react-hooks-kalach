@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useRef,
   useContext,
-  useReducer
+  useReducer,
+  useCallback
 } from 'react'
 
 import ThemeContext from "../context"
@@ -94,9 +95,10 @@ function App() {
     myRef.current.style.color = 'red'
   }
 
-  const setTypeRequest = (type) => {
+  const setTypeRequest = useCallback((type) => {
+    console.log('Memoized')
     dispatch({ type })
-  }
+  }, [data.typeRequest])
 
   return (
     <div className={ `app ${ theme }` }>

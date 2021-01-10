@@ -1,3 +1,21 @@
+# Приложение демонстрации React хуков
+
+Приложение создано по [видеоблогам Влада Калача на YouTube](https://www.youtube.com/watch?v=kSHwzrDWhsI&list=PLjyMGbjBhSpilg_r9sb-op3pYVMa_9uXG).
+
+Рассмотрены и применены следующие хуки:
+
+1. useState
+2. useEffect
+3. useMemo
+4. useRef
+5. useContext
+6. useReducer
+7. useCallback
+8. useLayoutEffect
+
+Хуки добавляются последовательно по ходу расширения приложения. \
+Каждый хук последовательно реализован в отдельном соответствующем коммите.
+
 # Создание проекта React приложения
 
 Приложение создано с помощью [Create React App](https://github.com/facebook/create-react-app).
@@ -15,7 +33,8 @@
 # Создаем стартовый шаблон приложения
 
 Стартовый шаблон приложения создается на основе GitHub-репозитория: \
-[VladKalachev/react-hooks](https://github.com/VladKalachev/react-hooks/tree/starter) (branch `starter`)
+[VladKalachev/react-hooks](https://github.com/VladKalachev/react-hooks/tree/starter) (branch `starter`), \
+либо в данном репозитории в коммите `Start point`
 
 ___
 
@@ -34,7 +53,7 @@ const [ state, setState ] = useState(initialState)
 Она принимает новое значение состояния и ставит в очередь повторный рендер компонента.
 
 1. Изменяем классовый компонент `App.js` на функциональный.
-2. Добавляем импорт `useState` из библиотеки `react`:
+2. Добавляем импорт `useState` из библиотеки `react` в компонент `App`:
 
    ```javascript
    import { useState } from "react"
@@ -105,7 +124,7 @@ useEffect(
 >
 >> Если передать пустой массив, то `useEffect` выполнится один раз.
 
-1. Добавляем импорт `useEffect` из библиотеки `react`:
+1. Добавляем импорт `useEffect` из библиотеки `react` в компонент `App`:
 
    ```javascript
    import { useEffect } from "react"
@@ -225,7 +244,7 @@ const refContainer = useRef(initialValue)
 Если необходимо запустить некоторый код, когда React присоединяет или отсоединяет _ref_ к узлу DOM, можно
 использовать [_callback_-реф](https://ru.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node) вместо этого.
 
-1. Добавляем импорт `useRef` из библиотеки `react`:
+1. Добавляем импорт `useRef` из библиотеки `react` в компонент `App`:
 
    ```javascript
    import { useRef } from "react"
@@ -375,7 +394,7 @@ const [ state, dispatch ] = useReducer(reducer, initialArg, init)
 
 > **dispatch** - возвращаемый `useRuducer` (совместно с состоянием) метод, позволяющий изменять состояние в зависимости от переданного экшена, согласно логике редюсера.
 
-1. Добавляем импорт `useReducer` из библиотеки `react`:
+1. Добавляем импорт `useReducer` из библиотеки `react` в компонент `App`:
 
    ```javascript
    import { useReducer } from "react"
@@ -429,4 +448,78 @@ const [ state, dispatch ] = useReducer(reducer, initialArg, init)
    `data.check` и \
    `data.typeRequest`.
    
+___
+
+## §7 Хук мемоизации callback'ов `useCallback`
+
+```javascript
+const memoizedCallback = useCallback(
+  () => {
+    doSomething(a, b)
+  },
+  [a, b],
+)
+```
+
+Возвращает мемоизированный callback.
+
+Передайте встроенный callback и массив зависимостей. Хук `useCallback` вернёт мемоизированную версию колбэка, который изменяется только, если изменяются значения одной из зависимостей. Это полезно при передаче колбэков оптимизированным дочерним компонентам, которые полагаются на равенство ссылок для предотвращения ненужных рендеров (например, `shouldComponentUpdate`).
+
+> `useCallback(fn, deps)` — это эквивалент `useMemo(() => fn, deps)`
+
+Основное предназначение — оптимизация рендеринга дочерних компонентов.
+
+В приложении существует следующая проблема.
+
+Функция `setTypeRequest` компонента `App` диспатчит в редюсер необходимый тип и передается через пропсы в компонент `Header`.
+
+Используем в компоненте `Header` следующий `useEffect`:
+
+   ```javascript
+   useEffect(() => {
+     console.log('Update <Header>')
+   }, [changeTypeRequest])
+   ```
+Списки постов обновляются по два раза (из-за зависимости компонента от функции, передаваемой в пропсы).
+
+1. Добавляем импорт `useCallback` из библиотеки `react` в компонент `App`:
+
+   ```javascript
+   import { useCallback } from "react"
+   ```
+   
+2. Оборачивает функцию `setTypeRequest` в `useCallback`:
+
+   ```javascript
+   const setTypeRequest = useCallback((type) => {
+      // console.log('Memoized')
+      dispatch({ type })
+   }, [data.typeRequest])
+   ```
+
+Лишняя перересовка дочерних компонентов устранена.
+
+___
+
+## §8 Хук эффекта `useLayoutEffect`
+
+Сигнатура идентична `useEffect`, но этот хук запускается синхронно после всех изменений DOM. Используйте его для чтения макета из DOM и синхронного повторного рендеринга. Обновления, запланированные внутри useLayoutEffect, будут полностью применены синхронно перед тем, как браузер получит шанс осуществить отрисовку.
+
+Предпочитайте стандартный `useEffect`, когда это возможно, чтобы избежать блокировки визуальных обновлений.
+
+> Практическую разницу можно наглядно увидеть в следующем небольшом примере при замене `useEffect` на `useLayoutEffect`:
+> ```javascript
+> import React, { useState, useEffect} from "react"
+> 
+> export default function App() {
+>   const [ value, setValue ] = useState(0)
+>   
+>   useEffect(() => {
+>     if (value === 0) {
+>       setValue(Math.random() * 99 + 99) 
+>     }  
+>   }, [ value ])
+> }
+>```
+
 ___
