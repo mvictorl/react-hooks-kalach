@@ -1,8 +1,9 @@
 import React, {
-  useState,
+  // useState,
   useEffect,
   useRef,
-  useContext
+  useContext,
+  useReducer
 } from 'react'
 
 import ThemeContext from "../context"
@@ -11,36 +12,90 @@ import Header from "./Header"
 import PostList from "./PostList"
 import Footer from "./Footer"
 
+function reducer(state, action) {
+  switch (action.type) {
+    case 'fetch':
+      return {
+        ...state,
+        posts: action.payload
+      }
+    case 'posts':
+      return {
+        ...state,
+        typeRequest: action.type
+      }
+    case 'users':
+      return {
+        ...state,
+        typeRequest: action.type
+      }
+    case 'check':
+      return {
+        ...state,
+        check: !state.check
+      }
+    case 'reset':
+      return init(action.payload)
+    default:
+      return state
+  }
+}
+
+function init(state) {
+  // console.log(state)
+  // return state
+  // Позволяет добавлять или изменять первичное состояние
+  return state
+}
+
 function App() {
   const myRef = useRef(null)
 
-  const [ posts, setPosts ] = useState([])
-  const [ check, setCheck ] = useState(false)
-  const [ typeRequest, setTypeRequest ] = useState('posts')
+  // const [ posts, setPosts ] = useState([])
+  // const [ check, setCheck ] = useState(false)
+  // const [ typeRequest, setTypeRequest ] = useState('posts')
 
   const { theme, setTheme } = useContext(ThemeContext)
 
+  const [ data, dispatch ] = useReducer(reducer,
+    {
+      posts: [],
+      check: false,
+      typeRequest: 'posts'
+    },
+    init
+  )
+
   useEffect(() => {
+    // console.log(data)
+    // dispatch({type: 'reset', payload: { posts: [], check: true, typeRequest: 'posts' }})
+
     setTimeout(() => {
-      document.title = `${ typeRequest } Page`
+      document.title = `${ data.typeRequest } Page`
     }, 500)
 
-    fetch(`https://jsonplaceholder.typicode.com/${ typeRequest }?_start=0&_limit=10`)
+    fetch(`https://jsonplaceholder.typicode.com/${ data.typeRequest }?_start=0&_limit=10`)
       .then(response => response.json())
-      .then(json => setPosts(json))
+      .then(json => {
+        dispatch({ type: 'fetch', payload: json })
+      })
     return () => {
       document.title = 'Page'
     }
-  }, [ typeRequest ])
+  }, [ data.typeRequest ])
 
   const change = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
-    setCheck(!check)
+    dispatch({ type: 'check' })
   }
 
   const handlerFocus = () => {
     myRef.current.focus()
     myRef.current.style.color = 'red'
+  }
+
+  const setTypeRequest = (type) => {
+    dispatch({ type })
   }
 
   return (
@@ -52,11 +107,11 @@ function App() {
 
       <Header
         changeTypeRequest={ setTypeRequest }
-        check={ check }
+        check={ data.check }
         changeTheme={ change }
       />
 
-      <PostList posts={ posts }/>
+      <PostList posts={ data.posts }/>
 
       <Footer/>
     </div>

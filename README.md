@@ -237,10 +237,10 @@ const refContainer = useRef(initialValue)
    const myRef = useRef(null)
    ```
 
-> В данном случае, при инициализации
->```javascript
->myRef == { current: null }
->```
+   > В данном случае, при инициализации
+   >```javascript
+   >myRef == { current: null }
+   >```
 
 3. Для демонстрации использования `useRef` добавляем элементы `<input>` с атрибутом `ref` равным `myRef` и `<button>` с
    обработчиком `onClick` равным пользовательской функции `handlerFocus`:
@@ -251,14 +251,14 @@ const refContainer = useRef(initialValue)
    }
    ```
 
-> Теперь _ref_ равен
->```javascript
->myRef == { current: input }
->```
->а его значение _current_
->```javascript
->myRef.current == <input type="text">
->```
+   > Теперь _ref_ равен
+   >```javascript
+   >myRef == { current: input }
+   >```
+   >а его значение _current_
+   >```javascript
+   >myRef.current == <input type="text">
+   >```
 
 4. Теперь возможны манипуляции с данным DOM-элементом. \
    Например, передача ему фокуса и/или изменение цвета текста:
@@ -313,7 +313,8 @@ const value = useContext(MyContext)
    ```
 
 3. Вынесем компонент `App` из функции `ReactDOM.render` в отдельный функциональный компонент (для возможности переноса в
-   него состояния темы), оборачиваем его в компонент `ThemeContext.Provider` с начальными значениями, возвращаемыми `useState`. \
+   него состояния темы), оборачиваем его в компонент `ThemeContext.Provider` с начальными значениями,
+   возвращаемыми `useState`. \
    Теперь дочерние компоненты имеют возможность доступа к переменной `theme` и функции `setTheme`:
 
    ```javascript
@@ -340,7 +341,8 @@ const value = useContext(MyContext)
    ```
 
 5. Получаем доступ к контексту с помощью хука `useContext`. \
-   Теперь компонент, в котором произошла подписка на контекст _(в данном случае `App`)_, будет перерендериваться при каждом изменении контекста:
+   Теперь компонент, в котором произошла подписка на контекст _(в данном случае `App`)_, будет перерендериваться при
+   каждом изменении контекста:
 
    ```javascript
    const { theme, setTheme } = useContext(ThemeContext)
@@ -351,5 +353,80 @@ const value = useContext(MyContext)
    ```javascript
    export default React.memo(App, () => true)
    ```
+
+   при изменении контекста будет происходить его перерендеринг.
+
+___
+
+## §6 Хук `useReducer`
+
+Альтернатива хуку `useState`, функционирующий аналогично библиотеке `Redux`.
+
+```js
+const [ state, dispatch ] = useReducer(reducer, initialArg, init)
+```
+
+где
+> **reducer** - функция-**редюсер** типа `(state, action) => newState`, принимающая текущее состояние и экшен, а возвращающая новое состояние.
+
+> **initialArg** - начальное состояние _(в виде объекта)_.
+
+> **init** - функция, устанавливающая начальное состояние _лениво (lazy)_.
+
+> **dispatch** - возвращаемый `useRuducer` (совместно с состоянием) метод, позволяющий изменять состояние в зависимости от переданного экшена, согласно логике редюсера.
+
+1. Добавляем импорт `useReducer` из библиотеки `react`:
+
+   ```javascript
+   import { useReducer } from "react"
+   ```
+
+2. Создаем функцию-редюсер:
+
+   ```javascript
+   function reducer(state, action) {
+      switch (action.type) {
+         case 'fetch':
+            return { ...state, posts: action.payload }
+         case 'posts':
+            return { ...state, typeRequest: action.type }
+         case 'users':
+            return { ...state, typeRequest: action.type }
+         case 'check':
+            return { ...state, check: !state.check }
+         case 'reset':
+            return init(action.payload)
+         default:
+            return state
+      }
+   }
+   ```
    
-   при изменении контекста будет происходить его перерендеринг. 
+3. Создаём заглушку функции `init`, которая возвращает состояние без изменений:
+
+   ```javascript
+   function init(state) {
+      return state
+   }
+   ```
+   
+4. Используем хук `useReducer` для инициализации состояний и получения функции `dispatch`:
+
+   ```javascript
+   const [ data, dispatch ] = useReducer(
+    reducer,
+    {
+      posts: [],
+      check: false,
+      typeRequest: 'posts'
+    },
+    init
+   )
+   ```
+   
+   Теперь переменные состояния хранятся в объекте `data`: \
+   `data.posts`, \
+   `data.check` и \
+   `data.typeRequest`.
+   
+___
